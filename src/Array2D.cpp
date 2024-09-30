@@ -10,7 +10,6 @@ Array2D::Array2D(const int x, const int y) {
 
 Array2D::~Array2D() {
     delete[] array;
-    std::cout << "Деструктор отработал\n";
 }
 
 void Array2D::printArray() {
@@ -25,19 +24,44 @@ void Array2D::printArray() {
     }
 }
 
-void Array2D::pprintArray(int number_digits){
+void Array2D::writeLine(int lenth, char simbol, char separator1, char separator2){
+    for(int i{}; i<lenth; ++i){
+        
+        if(i % 12 == 11 && i != 0) std::cout << separator2;
+        else if (i%4 == 3 && i != 0) std::cout << separator1;
+        else std::cout << simbol;
+
+    }
+    std::cout<<"\n";
+}
+
+void Array2D::pprintArray(){
 
     /*Реализовать красивый вывод таблицы*/
 
     for (int y{}; y < height; ++y) {
+        
+
         for (int x{}; x < width; ++x) {
-            int element{array[y * width + x]};
-            int num_dig_in_element{};
+
+            if(x == 0) std::cout << " ";
+
+            std::cout << array[y * width + x];
+
             if (x < width - 1) {
-                std::cout << " ";
+                if (x % 3 == 2) std::cout << " # ";
+                else std::cout << " | ";
             }
         }
         std::cout << "\n";
+        
+        if(y < height-1){
+
+        if (y % 3 == 2) writeLine(4*width-1, '#', '#', '#');
+        else writeLine(4*width-1, '-', '|', '#');
+        
+        }
+        
     }
 }
 
