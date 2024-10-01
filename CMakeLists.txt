@@ -12,4 +12,4 @@ set(CMAKE_CXX_COMPILER /usr/bin/clang++)
 
 
 # Добавляем исполняемый файл, указывая исходники из src/ директории
-add_executable(sudoku src/main.cpp src/Array2D.cpp src/Array2D.h)
+add_executable(sudoku src/main.cpp src/Array2D.h src/Sudoku.cpp src/Sudoku.h)
