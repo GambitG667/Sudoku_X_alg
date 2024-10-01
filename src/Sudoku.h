@@ -1,6 +1,12 @@
 #include "Array2D.h"
 
 
+enum Mode{
+    COLUM = 0,
+    RAW = 1
+};
+
+
 class Sudoku{
 private:
     Array2D<int> field;
@@ -12,8 +18,12 @@ public:
     ~Sudoku();
     void render();
     void print();
-    void write_line(int number, bool is_vertical, char fill);
-
-
+    void print_field();
+    void write_line(int number, Mode mode, char fill);
+    void swap(int number1, int number2, Mode mode);
+    void swap_districts(int number1, int number2, Mode mode);
+    void base_generate();
+    void random_generate(int seed);
+    void random_generate();
 
 };
