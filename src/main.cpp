@@ -1,19 +1,33 @@
+#include "Array2D.h"
 #include "Sudoku.h"
 #include <cstdlib>
 #include <ctime>
 
+void function( Array2D<Cell> & matrix){
+    matrix[1].value = 5;
+}
+
+
 int main(){
 
-    srand(static_cast<unsigned int>(time(0)));
+
+
+    int arr[81];
+    for(int i{}; i < 81; ++i){
+        std::cin >> arr[i];
+    }
 
     Sudoku sudoku;
-    sudoku.base_generate();
-    for(int i{}; i < 50; ++i){
-        sudoku.random_generate();
+    for(int i{}; i < 81; ++i){
+        sudoku.field[i] = arr[i];
     }
     sudoku.render();
     sudoku.print();
-
+    std::cout << '\n';
+    Solver solver;
+    sudoku.field = solver.solve(sudoku.field);
+    sudoku.render();
+    sudoku.print();
 
     return 0;
 }

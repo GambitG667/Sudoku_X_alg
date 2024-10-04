@@ -6,7 +6,10 @@
 
 
 
-Sudoku::Sudoku(): field(9,9, 7), screan(35, 17, ' ') {
+Sudoku::Sudoku(): field(9,9), screan(35, 17) {
+    field.fill(7);
+    screan.fill(' ');
+    
     height_screan = 17;
     width_screan = 35;
 }
@@ -128,3 +131,75 @@ void Sudoku::random_generate(){
         swap_districts(number1, number2, Mode(rand()%2));
     }
 }    
+
+
+int Cell::number_of_variants(){
+    int result{};
+    for(int i: character_vector) result += i;
+    return result;
+}
+
+
+Array2D<int> Solver::solve(Array2D<int> field){
+    Array2D<int> result = field;
+
+
+    Array2D<Cell> matrix(9,9);
+    
+    for(int i{0}; i < 9*9; ++i){
+        if(result[i] != 0){
+            matrix[i].is_solved = true;
+            matrix[i].value = result[i];
+        }
+    }
+    
+    check_variants(matrix);
+
+    while(is_solved(matrix) == NOTSOLVED){
+        for(int i{}; i < 9*9; ++i){
+            if(matrix[i].is_solved) continue;
+            if(matrix[i].number_of_variants() == 1){for(int j{1}; j<10; ++j){
+                if(matrix[i].character_vector[j] != 0){
+                    matrix[i].value = j;
+                    matrix[i].is_solved = true;
+                }                
+            }
+            }
+        }
+        check_variants(matrix);
+    }
+
+
+    for(int i{}; i < 9*9; ++i) result[i] = matrix[i].value;
+
+    return result;
+}
+
+void Solver::check_variants(Array2D<Cell> &matrix){
+    for(int i{}; i < 9*9; ++i){
+
+        for(int j{}; j < 9*9; ++j){
+            
+            if(matrix[j].is_solved) continue;
+
+            if((i/9 == j/9 || i%9 == j%9 || (i/9/3==j/9/3 && i%9/3==j%9/3)) && i != j){
+                matrix[j].character_vector[matrix[i].value] = 0;
+            }
+        }
+    }
+
+
+
+}
+
+Status Solver::is_solved(Array2D<Cell> &matrix){
+    bool result{true};
+    
+    for(int i{}; i < 9*9; ++i){
+        if(matrix[i].number_of_variants() == 0) return NOSULUTION;
+        if(!matrix[i].is_solved) result = false;
+    }
+    
+    if(result) return SOLVED;
+    else return NOTSOLVED;
+}
