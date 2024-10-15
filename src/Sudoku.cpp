@@ -19,10 +19,10 @@ void Sudoku::render(){
     char sep_g = '-';
     char m_sep = '#';
 
-    for(int i{1}; i < 17; i += 2) write_line(i, RAW, sep_g);
+    for(int i{1}; i < 17; i += 2) write_line(i, STR, sep_g);
     for(int i{3}; i < 35; i += 4) write_line(i, COLUM, sep_v);
     for(int i{11}; i < 35; i += 12) write_line(i, COLUM, m_sep);
-    for(int i{5}; i < 17; i += 6) write_line(i, RAW, m_sep);
+    for(int i{5}; i < 17; i += 6) write_line(i, STR, m_sep);
     for(int j{}, y{}; y < 9; j += 2, ++y) 
         for( int i{1}, x{}; x < 9; i += 4, ++x) 
             screan(i,j) = static_cast<char>('0'+field(x, y));
@@ -155,18 +155,72 @@ Array2D<int> Solver::solve(Array2D<int> field){
     
     check_variants(matrix);
 
-    while(is_solved(matrix) == NOTSOLVED){
-        for(int i{}; i < 9*9; ++i){
+    int count{};
+    for(bool is_going{true}; is_going; ++count){
+        
+        for(int i{}, flag{}; i < 9*9; ++i){
             if(matrix[i].is_solved) continue;
-            if(matrix[i].number_of_variants() == 1){for(int j{1}; j<10; ++j){
-                if(matrix[i].character_vector[j] != 0){
-                    matrix[i].value = j;
-                    matrix[i].is_solved = true;
-                }                
+            if(matrix[i].number_of_variants() == 1){
+                for(int j{1}; j<10; ++j){
+                    if(matrix[i].character_vector[j] != 0){
+                        matrix[i].value = j;
+                        matrix[i].is_solved = true;
+                        flag = 1;
+                        break;
+                    }                
+                }
             }
+            if(flag == 1) break;
+        }
+
+        check_variants(matrix);
+
+        switch (is_solved(matrix)) {
+            case NOTSOLVED:{
+                std::cout << count << " There is more than one solution\n";
+                int min_v{10};
+                int index_min{0};
+                int num_vars{0};
+                for(int i{}; i < 9*9; ++i){
+
+                    if(matrix[i].is_solved) continue;
+
+                    num_vars = matrix[i].number_of_variants();
+                    if(min_v > num_vars){
+                        min_v = num_vars;
+                        index_min = i;
+                    }
+                }
+                std::cout <<count << " min index = "<<index_min;
+                for(int i{}; i < 10; ++i){
+                    if(matrix[index_min].character_vector[i] == 1) {
+                        matrix[index_min].value = i;
+                        matrix[index_min].is_solved = true;
+                        std::cout << " and new value = " << i << '\n';
+                        break;
+                    }
+                }
+                check_variants(matrix);
+                break;
+            }
+            case SOLVED:{
+                std::cout << count << " Sulution is passed!\n";
+                is_going = false;
+                break;
+            }
+            case NOSULUTION:{
+                std::cout << count << "There is not solution\n";
+                is_going = false;
+                break;
+            }
+            case ONESOLUTION:{
+                std::cout << count << " There is one solution\n";
+                break;
             }
         }
-        check_variants(matrix);
+
+        // std::cout << count << " Cicle is passed\n";
+
     }
 
 
@@ -193,13 +247,16 @@ void Solver::check_variants(Array2D<Cell> &matrix){
 }
 
 Status Solver::is_solved(Array2D<Cell> &matrix){
-    bool result{true};
+    bool solved{true};
+    bool onesolution{false};
     
     for(int i{}; i < 9*9; ++i){
         if(matrix[i].number_of_variants() == 0) return NOSULUTION;
-        if(!matrix[i].is_solved) result = false;
+        if(matrix[i].number_of_variants() == 1 && !matrix[i].is_solved) onesolution = true;
+        if(!matrix[i].is_solved) solved = false;
     }
-    
-    if(result) return SOLVED;
+
+    if(solved) return SOLVED;
+    if(onesolution) return ONESOLUTION;
     else return NOTSOLVED;
 }

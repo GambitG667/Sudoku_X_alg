@@ -1,15 +1,19 @@
 #include "Array2D.h"
+#include <string>
+#include <vector>
 
+class AssociadetArray;
 
 enum Mode{
     COLUM = 0,
-    RAW = 1
+    STR = 1
 };
 
 enum Status{
     NOTSOLVED = 0,
     SOLVED = 1,
-    NOSULUTION = -1
+    NOSULUTION = -1,
+    ONESOLUTION = -2
 };
 
 
