@@ -2,7 +2,7 @@
 #include "Matrix.h"
 #include <string>
 #include <vector>
-
+#pragma once
 class AssociadetArray;
 
 enum Mode{
@@ -61,6 +61,8 @@ struct Cadr{
     std::vector<AssociadetArray*> deleted_elements;
     Matrix* matrix;
     std::vector<AssociadetArray*> X;
+
+    void print();
 };
 
 

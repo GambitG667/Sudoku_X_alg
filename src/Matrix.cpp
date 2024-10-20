@@ -36,6 +36,7 @@ void Colum::push_back(Node* node){
 void Colum::remove(){
     if(previus != nullptr) previus -> next = next;
     if(next != nullptr) next -> previus = previus;
+    if(previus == nullptr) matrix->colums_header = next;
     Node* ptr = first;
     while(ptr != nullptr){
         if(ptr->right != nullptr) ptr->right->left = ptr->left;
@@ -48,6 +49,7 @@ void Colum::remove(){
 void Colum::recovery(){
     if(previus != nullptr) previus -> next = this;
     if(next != nullptr) next -> previus = this;
+    if(previus == nullptr) matrix->colums_header = this;
     Node* ptr = first;
     while(ptr != nullptr){
         if(ptr->right != nullptr) ptr->right->left = ptr;
@@ -119,10 +121,12 @@ void String::push_back(Node* node){
 void String::remove(){
     if(previus != nullptr) previus -> next = next;
     if(next != nullptr) next -> previus = previus;
+    if(previus == nullptr) matrix->string_header = next;
     Node* ptr = first;
     while(ptr != nullptr){
         if(ptr->top != nullptr) ptr->top->down = ptr->down;
         if(ptr->down != nullptr) ptr->down->top = ptr->top;
+        if(ptr->top == nullptr) ptr->head_top->first = ptr->down;
         ptr = ptr->right;
     }
 }
@@ -130,10 +134,12 @@ void String::remove(){
 void String::recovery(){
     if(previus != nullptr) previus -> next = this;
     if(next != nullptr) next -> previus = this;
+    if(previus == nullptr) matrix->string_header = this;
     Node* ptr = first;
     while(ptr != nullptr){
         if(ptr->top != nullptr) ptr->top->down = ptr;
         if(ptr->down != nullptr) ptr->down->top = ptr;
+        if(ptr->top == nullptr) ptr->head_top->first = ptr;
         ptr = ptr->right;
     }
 }
@@ -184,9 +190,11 @@ Matrix::~Matrix(){
 
 void Matrix::set_colums(int len){
     colums_header = new Colum(0);
+    colums_header->matrix = this;
     AssociadetArray *ptr = colums_header;
     for(int i{1}; i < len; ++i){
         Colum* colum = new Colum(i);
+        colum->matrix = this;
         ptr->next = colum;
         colum->previus = ptr;
         ptr = colum;
@@ -198,8 +206,10 @@ void Matrix::add_string(int* array){
     if(string_header == nullptr){
         string_header = new String(0);
         last_string = string_header;
+        string_header->matrix = this;
     }else{
         String* new_str = new String(last_string->index+1);
+        new_str->matrix = this;
         last_string->next = new_str;
         new_str -> previus = last_string;
         last_string = new_str;
@@ -230,4 +240,24 @@ void Matrix::print(){
     }
     screan.printArray();
     std::cout<<std::endl;
+}
+
+int Matrix::count_colums(){
+    int result = 0;
+    AssociadetArray* ptr = colums_header;
+    while(ptr !=0){
+        ++result;
+        ptr = ptr->next;
+    }
+    return result;
+}
+
+int Matrix::count_strings(){
+    int result = 0;
+    AssociadetArray* ptr = string_header;
+    while(ptr !=0){
+        ++result;
+        ptr = ptr->next;
+    }
+    return result;
 }

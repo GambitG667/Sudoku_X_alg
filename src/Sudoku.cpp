@@ -1,5 +1,6 @@
 #include "Sudoku.h"
 #include "Array2D.h"
+#include "Matrix.h"
 #include <iostream>
 #include <vector>
 #include <set>
@@ -268,8 +269,10 @@ Cadr Solver::create_cadr(Matrix& matrix){
     result.matrix = &matrix;
 
     AssociadetArray * s = matrix.colums_header;
+    if(s == nullptr) return result;
     int size_s = s->size();
     AssociadetArray* ptr = matrix.colums_header;
+
     while(ptr != nullptr){
         if(size_s > ptr->size()){
             s = ptr;
@@ -280,8 +283,8 @@ Cadr Solver::create_cadr(Matrix& matrix){
     Node* node_ptr = s->first;
     while (node_ptr != nullptr){
         result.X.push_back(node_ptr->head_left);
+        node_ptr = node_ptr->down;
     }
-    
     return result;
 
 }
@@ -303,6 +306,7 @@ Cadr Solver::next_cadr(Matrix& matrix, Cadr& previus, std::vector<AssociadetArra
         node_ptr = colum->first;
         while (node_ptr != nullptr) {
             strings.insert(node_ptr->head_left);
+            node_ptr = node_ptr->down;
         }
     }
 
@@ -321,7 +325,7 @@ Cadr Solver::next_cadr(Matrix& matrix, Cadr& previus, std::vector<AssociadetArra
 }
 
 void Solver::reverse_cadr(Cadr& cadr){
-    for(int i=cadr.deleted_elements.size(); i >= 0; --i){
+    for(int i=cadr.deleted_elements.size()-1; i >= 0; --i){
         cadr.deleted_elements.at(i)->recovery();
     }
 }
@@ -330,21 +334,31 @@ void Solver::X_algorithm(Matrix& matrix, std::vector<AssociadetArray*>& stack){
     std::vector<Cadr> cadrs;
     int index = 0;
     cadrs.push_back(create_cadr(matrix));
-    while(true){
+    
+    for(int i{}; i < 10; ++i){
         if(index < 0) break;
-        if(matrix.colums_header->lenth_chain() == 0){
+
+        if(matrix.count_colums() == 0){
+            std::cout << "Найдено решение\n";
             break;
         }
-        if(matrix.string_header->lenth_chain() == 0){
+
+        if(matrix.count_strings() == 0){
             reverse_cadr(cadrs.at(index));
             cadrs.pop_back();
             --index;
+            std::cout << "Тупиковая ветвь\n";
+            continue;
         }
         if(cadrs.at(index).X.empty()){
             reverse_cadr(cadrs.at(index));
             cadrs.pop_back();
             --index;
+            std::cout << "Варианты закончились\n";
+            continue;
         }
+        cadrs.push_back(next_cadr(matrix, cadrs.at(index), stack));
+        ++index;
     }
 
     while(index > 0){
@@ -352,4 +366,14 @@ void Solver::X_algorithm(Matrix& matrix, std::vector<AssociadetArray*>& stack){
         cadrs.pop_back();
         --index;
     }
+}
+
+
+void Cadr::print(){
+    std::cout << "---------------\n";
+    for(auto i: deleted_elements) std::cout<<i->index << ' ';
+    std::cout << '\n';
+    for(auto i: X) std::cout<<i->index << ' ';
+    std::cout << '\n';
+    std::cout << "---------------\n";
 }

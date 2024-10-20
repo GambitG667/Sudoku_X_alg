@@ -1,9 +1,10 @@
 #include <vector>
 #include <iostream>
-
+#pragma once
 class AssociadetArray;
 class Colum;
 class String;
+class Matrix;
 
 
 struct Node{
@@ -23,6 +24,7 @@ public:
     Node* last=nullptr;
     AssociadetArray* previus=nullptr;
     AssociadetArray* next=nullptr;
+    Matrix* matrix = nullptr;
 
     AssociadetArray(int index):index(index){};
     virtual ~AssociadetArray(){};
@@ -70,5 +72,7 @@ public:
     
     void set_colums(int len);
     void add_string(int* array);
+    int count_colums();
+    int count_strings();
     void print();
 };
