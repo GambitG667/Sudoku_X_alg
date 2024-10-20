@@ -1,4 +1,5 @@
 #include "Array2D.h"
+#include "Matrix.h"
 #include <string>
 #include <vector>
 
@@ -56,6 +57,12 @@ struct Cell{
     int number_of_variants();
 };
 
+struct Cadr{
+    std::vector<AssociadetArray*> deleted_elements;
+    Matrix* matrix;
+    std::vector<AssociadetArray*> X;
+};
+
 
 class Solver{
 private:
@@ -64,5 +71,9 @@ public:
 
     void check_variants(Array2D<Cell> &matrix);
     Array2D<int> solve( Array2D<int> field);
+    Cadr create_cadr(Matrix& matrix);
+    Cadr next_cadr(Matrix& matrix, Cadr& previus, std::vector<AssociadetArray*>& stack);
+    void reverse_cadr(Cadr& cadr);
+    void X_algorithm(Matrix& matrix, std::vector<AssociadetArray*>& stack);
     Status is_solved(Array2D<Cell> & matrix);
 };

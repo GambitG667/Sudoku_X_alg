@@ -57,6 +57,28 @@ void Colum::recovery(){
     }
 }
 
+int Colum::size(){
+    int result{0};
+
+    Node* ptr = first;
+    while(ptr != nullptr){
+        ++result;
+        ptr = ptr->down;
+    }
+
+    return result;
+}   
+
+int Colum::lenth_chain(){
+    int result{};
+    AssociadetArray * ptr = this;
+    while(ptr != nullptr){
+        ++result;
+        ptr = ptr->next;
+    }
+    return result;
+}
+
 Colum::~Colum(){
     Node* ptr = last;
     while(ptr->top != nullptr){
@@ -114,6 +136,28 @@ void String::recovery(){
         if(ptr->down != nullptr) ptr->down->top = ptr;
         ptr = ptr->right;
     }
+}
+
+int String::size(){
+    int result{0};
+
+    Node* ptr = first;
+    while(ptr != nullptr){
+        ++result;
+        ptr = ptr->right;
+    }
+
+    return result;
+}  
+
+int String::lenth_chain(){
+    int result{};
+    AssociadetArray * ptr = this;
+    while(ptr != nullptr){
+        ++result;
+        ptr = ptr->next;
+    }
+    return result;
 }
 
 Matrix::Matrix(int len){

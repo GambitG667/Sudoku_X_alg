@@ -30,6 +30,8 @@ public:
     virtual void  push_back(Node* node)=0;
     virtual void  remove()=0;
     virtual void  recovery()=0;
+    virtual int   size()=0;
+    virtual int   lenth_chain()=0;
 };
 
 class Colum: public AssociadetArray{
@@ -38,6 +40,8 @@ public:
     void  push_back(Node* node) override;
     void  remove() override;
     void  recovery() override;
+    int   size() override;
+    int   lenth_chain() override;
     Colum(int index):AssociadetArray(index){}
     ~Colum();
 };
@@ -48,6 +52,8 @@ public:
     void push_back(Node* node) override;
     void remove() override;
     void recovery() override;
+    int   size() override;
+    int   lenth_chain() override;
     String(int index):AssociadetArray(index){}
 };
 

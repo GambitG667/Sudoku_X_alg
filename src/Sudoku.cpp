@@ -1,6 +1,8 @@
 #include "Sudoku.h"
 #include "Array2D.h"
 #include <iostream>
+#include <vector>
+#include <set>
 
 
 
@@ -259,4 +261,95 @@ Status Solver::is_solved(Array2D<Cell> &matrix){
     if(solved) return SOLVED;
     if(onesolution) return ONESOLUTION;
     else return NOTSOLVED;
+}
+
+Cadr Solver::create_cadr(Matrix& matrix){
+    Cadr result;
+    result.matrix = &matrix;
+
+    AssociadetArray * s = matrix.colums_header;
+    int size_s = s->size();
+    AssociadetArray* ptr = matrix.colums_header;
+    while(ptr != nullptr){
+        if(size_s > ptr->size()){
+            s = ptr;
+            size_s = s->size();
+        }
+        ptr = ptr->next;
+    }
+    Node* node_ptr = s->first;
+    while (node_ptr != nullptr){
+        result.X.push_back(node_ptr->head_left);
+    }
+    
+    return result;
+
+}
+
+Cadr Solver::next_cadr(Matrix& matrix, Cadr& previus, std::vector<AssociadetArray*>& stack){
+    std::vector<AssociadetArray*> remuved_elements;
+    stack.push_back(previus.X.back());
+    previus.X.pop_back();
+    std::set<AssociadetArray*> colums;
+    std::set<AssociadetArray*> strings;
+
+    Node* node_ptr = stack.back()->first;
+
+    while(node_ptr != nullptr){
+        colums.insert(node_ptr->head_top);
+        node_ptr = node_ptr->right;
+    }
+    for(auto colum:colums){
+        node_ptr = colum->first;
+        while (node_ptr != nullptr) {
+            strings.insert(node_ptr->head_left);
+        }
+    }
+
+    for(auto colum:colums){
+        colum->remove();
+        remuved_elements.push_back(colum);
+    }
+    for(auto string:strings){
+        string->remove();
+        remuved_elements.push_back(string);
+    }
+
+    Cadr result = create_cadr(matrix);
+    result.deleted_elements = remuved_elements;
+    return result;
+}
+
+void Solver::reverse_cadr(Cadr& cadr){
+    for(int i=cadr.deleted_elements.size(); i >= 0; --i){
+        cadr.deleted_elements.at(i)->recovery();
+    }
+}
+
+void Solver::X_algorithm(Matrix& matrix, std::vector<AssociadetArray*>& stack){
+    std::vector<Cadr> cadrs;
+    int index = 0;
+    cadrs.push_back(create_cadr(matrix));
+    while(true){
+        if(index < 0) break;
+        if(matrix.colums_header->lenth_chain() == 0){
+            break;
+        }
+        if(matrix.string_header->lenth_chain() == 0){
+            reverse_cadr(cadrs.at(index));
+            cadrs.pop_back();
+            --index;
+        }
+        if(cadrs.at(index).X.empty()){
+            reverse_cadr(cadrs.at(index));
+            cadrs.pop_back();
+            --index;
+        }
+    }
+
+    while(index > 0){
+        reverse_cadr(cadrs.at(index));
+        cadrs.pop_back();
+        --index;
+    }
 }
