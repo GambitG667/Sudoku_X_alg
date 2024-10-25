@@ -397,6 +397,7 @@ Array2D<int> Solver::solve_with_X_alg(Array2D<int> &field){
         }
     }
     X_algorithm(matrix, stack);
+    std::cout << "X algorithm finished!\n";
 
     for(auto string:stack){
         int index = string->first->head_top->index + 1;                   // декодирование индекса
