@@ -347,6 +347,7 @@ void Solver::X_algorithm(Matrix& matrix, std::vector<AssociadetArray*>& stack){
             reverse_cadr(cadrs.at(index));
             cadrs.pop_back();
             --index;
+            stack.pop_back();
             std::cout << "Тупиковая ветвь\n";
             continue;
         }
@@ -354,6 +355,7 @@ void Solver::X_algorithm(Matrix& matrix, std::vector<AssociadetArray*>& stack){
             reverse_cadr(cadrs.at(index));
             cadrs.pop_back();
             --index;
+            stack.pop_back();
             std::cout << "Варианты закончились\n";
             continue;
         }
