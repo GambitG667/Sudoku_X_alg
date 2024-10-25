@@ -335,7 +335,7 @@ void Solver::X_algorithm(Matrix& matrix, std::vector<AssociadetArray*>& stack){
     int index = 0;
     cadrs.push_back(create_cadr(matrix));
     
-    for(int i{}; i < 10; ++i){
+    while(true){
         if(index < 0) break;
 
         if(matrix.count_colums() == 0){
@@ -376,4 +376,64 @@ void Cadr::print(){
     for(auto i: X) std::cout<<i->index << ' ';
     std::cout << '\n';
     std::cout << "---------------\n";
+}
+
+Array2D<int> Solver::solve_with_X_alg(Array2D<int> &field){
+    Matrix matrix(4*9*9);
+    std::vector<AssociadetArray*> stack;
+    Array2D<int> result(9,9);
+    
+    for(int index{}; index < 81; ++index){
+        if(field[index] != 0){
+            int character_vector[4*9*9] = {0};
+            create_character_vector(index, field[index], character_vector);
+            matrix.add_string(character_vector);
+        }else{
+            for(int value{1}; value <= 9; ++value){
+                int character_vector[4*9*9] = {0};
+                create_character_vector(index, value, character_vector);
+                matrix.add_string(character_vector);
+            }
+        }
+    }
+    X_algorithm(matrix, stack);
+
+    for(auto string:stack){
+        int index = string->first->head_top->index + 1;                   // декодирование индекса
+        int value = (string->first->right->head_top->index - 81) / 9 + 1; // декодирование значения
+
+        result[index] = value;
+    }
+
+    return result;
+}
+
+void Solver::create_character_vector(int index, int value, int* character_vector){
+    /*
+    1) в каждой клетке по цифре
+    2) в каждой строке каждое число встречается один раз
+    3) в каждом столбце каждое число встречается один раз
+    4) в каждом квадранте каждое число всречается один раз
+    
+    character vector = [<81: число в клетке><9*<9:число в строке>><9*<9:число в столбце>><9*<9:число в квадранте>>]
+    
+    число n в клетке x:
+    i строка = x / 9
+    j столбец = x % 9
+    k квадрант = i / 3 * 3 + j / 3
+
+    character_vector[x] = 1 <81: число в клетке>
+    character_vector[81+9*(n-1)+(j-1)] = 1 <9*<9:число в строке>
+    character_vector[162+9*(n-1)+(i-1)] = 1 <9*<9: число в столбце>>
+    character_vector[243+9*(n-1)+(k-1)] = 1 <9*<9: число в квадранте>>
+    */
+
+    int i = index/9;          // строка
+    int j = index%9;          // столбец
+    int k = i/3*3 + j/3;      // квадрант
+
+    character_vector[index] = 1;                 // <81: число в клетке>
+    character_vector[81+9*(value-1)+(i-1)] = 1;  // <9*<9:число в строке>
+    character_vector[162+9*(value-1)+(j-1)] = 1; // <9*<9:число в столбце>
+    character_vector[243+9*(value-1)+(k-1)] = 1; // <9*<9:число в квадранте>
 }

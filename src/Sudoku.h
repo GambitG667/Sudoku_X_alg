@@ -77,5 +77,8 @@ public:
     Cadr next_cadr(Matrix& matrix, Cadr& previus, std::vector<AssociadetArray*>& stack);
     void reverse_cadr(Cadr& cadr);
     void X_algorithm(Matrix& matrix, std::vector<AssociadetArray*>& stack);
+    Array2D<int> solve_with_X_alg(Array2D<int> &field);
+    void create_character_vector(int index, int value, int* character_vector);
     Status is_solved(Array2D<Cell> & matrix);
+    
 };
