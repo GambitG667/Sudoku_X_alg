@@ -10,13 +10,6 @@ enum Mode{
     STR = 1
 };
 
-enum Status{
-    NOTSOLVED = 0,
-    SOLVED = 1,
-    NOSULUTION = -1,
-    ONESOLUTION = -2
-};
-
 
 class Sudoku{
 public:
@@ -49,13 +42,6 @@ public:
 
 };
 
-struct Cell{
-    bool is_solved = false;
-    int value = 0;
-    int character_vector[10]={0, 1, 1, 1, 1, 1, 1, 1, 1, 1};
-
-    int number_of_variants();
-};
 
 struct Cadr{
     std::vector<AssociadetArray*> deleted_elements;
@@ -71,14 +57,11 @@ private:
 
 public:
 
-    void check_variants(Array2D<Cell> &matrix);
-    Array2D<int> solve( Array2D<int> field);
-    Cadr create_cadr(Matrix& matrix);
-    Cadr next_cadr(Matrix& matrix, Cadr& previus, std::vector<AssociadetArray*>& stack);
-    void reverse_cadr(Cadr& cadr);
-    std::vector<std::vector<AssociadetArray*>> X_algorithm(Matrix& matrix, std::vector<AssociadetArray*>& stack);
-    std::vector<Array2D<int>> solve_with_X_alg(Array2D<int> &field);
-    void create_character_vector(int index, int value, int* character_vector);
-    Status is_solved(Array2D<Cell> & matrix);
+    static Cadr create_cadr(Matrix& matrix);
+    static Cadr next_cadr(Matrix& matrix, Cadr& previus, std::vector<AssociadetArray*>& stack);
+    static void reverse_cadr(Cadr& cadr);
+    static std::vector<std::vector<AssociadetArray*>> X_algorithm(Matrix& matrix, std::vector<AssociadetArray*>& stack);
+    static std::vector<Array2D<int>> solve_with_X_alg(Array2D<int> &field);
+    static void create_character_vector(int index, int value, int* character_vector);
 
 };
