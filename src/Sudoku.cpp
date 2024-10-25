@@ -330,7 +330,9 @@ void Solver::reverse_cadr(Cadr& cadr){
     }
 }
 
-void Solver::X_algorithm(Matrix& matrix, std::vector<AssociadetArray*>& stack){
+std::vector<std::vector<AssociadetArray*>> Solver::X_algorithm(Matrix& matrix, std::vector<AssociadetArray*>& stack){
+    std::vector<std::vector<AssociadetArray*>> ansvers;
+    
     std::vector<Cadr> cadrs;
     int index = 0;
     cadrs.push_back(create_cadr(matrix));
@@ -339,14 +341,20 @@ void Solver::X_algorithm(Matrix& matrix, std::vector<AssociadetArray*>& stack){
         if(index < 0) break;
 
         if(matrix.count_colums() == 0){
+            ansvers.push_back(stack);
+            reverse_cadr(cadrs.at(index));
+            cadrs.pop_back();
+            --index;
+            stack.pop_back();
             std::cout << "Найдено решение\n";
-            break;
+            continue;
         }
 
         if(matrix.count_strings() == 0){
             reverse_cadr(cadrs.at(index));
             cadrs.pop_back();
             --index;
+            stack.pop_back();
             std::cout << "Тупиковая ветвь\n";
             continue;
         }
@@ -354,7 +362,7 @@ void Solver::X_algorithm(Matrix& matrix, std::vector<AssociadetArray*>& stack){
             reverse_cadr(cadrs.at(index));
             cadrs.pop_back();
             --index;
-            std::cout << "Варианты закончились\n";
+            stack.pop_back();
             continue;
         }
         cadrs.push_back(next_cadr(matrix, cadrs.at(index), stack));
@@ -366,6 +374,8 @@ void Solver::X_algorithm(Matrix& matrix, std::vector<AssociadetArray*>& stack){
         cadrs.pop_back();
         --index;
     }
+
+    return ansvers;
 }
 
 
@@ -378,10 +388,10 @@ void Cadr::print(){
     std::cout << "---------------\n";
 }
 
-Array2D<int> Solver::solve_with_X_alg(Array2D<int> &field){
+std::vector<Array2D<int>> Solver::solve_with_X_alg(Array2D<int> &field){
     Matrix matrix(4*9*9);
     std::vector<AssociadetArray*> stack;
-    Array2D<int> result(9,9);
+    std::vector<Array2D<int>> result;
     
     for(int index{}; index < 81; ++index){
         if(field[index] != 0){
@@ -396,14 +406,20 @@ Array2D<int> Solver::solve_with_X_alg(Array2D<int> &field){
             }
         }
     }
-    X_algorithm(matrix, stack);
+    std::vector<std::vector<AssociadetArray*>> ansvers;
+
+    ansvers = X_algorithm(matrix, stack);
     std::cout << "X algorithm finished!\n";
 
-    for(auto string:stack){
-        int index = string->first->head_top->index;                   // декодирование индекса
-        int value = (string->first->right->head_top->index - 81) / 9 + 1; // декодирование значения
+    for(auto ansver: ansvers){
+        Array2D<int> field(9, 9);
+        for(auto string:ansver){
+            int index = string->first->head_top->index;                   // декодирование индекса
+            int value = (string->first->right->head_top->index - 81) / 9 + 1; // декодирование значения
 
-        result[index] = value;
+        field[index] = value;
+        }
+        result.push_back(field);
     }
 
     return result;

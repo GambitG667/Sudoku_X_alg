@@ -18,10 +18,11 @@ int main(){
     sudoku.render();
     sudoku.print();
 
-    sudoku.field = solver.solve_with_X_alg(sudoku.field);
-
-    sudoku.render();
-    sudoku.print();
-
+    for(auto sulution:solver.solve_with_X_alg(sudoku.field)){
+        std::cout<< "\n------------------------------------\n";
+        sudoku.field = sulution;
+        sudoku.render();
+        sudoku.print();
+    }
     return 0;
 }
