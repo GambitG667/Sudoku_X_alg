@@ -115,6 +115,8 @@ void Sudoku::random_generate(int seed){
 }
 
 void Sudoku::random_generate(){
+    
+    
     if(rand() % 2 == 1){
 
         int number_district = rand()%3;
@@ -135,134 +137,6 @@ void Sudoku::random_generate(){
     }
 }    
 
-
-int Cell::number_of_variants(){
-    int result{};
-    for(int i: character_vector) result += i;
-    return result;
-}
-
-
-Array2D<int> Solver::solve(Array2D<int> field){
-    Array2D<int> result = field;
-
-
-    Array2D<Cell> matrix(9,9);
-    
-    for(int i{0}; i < 9*9; ++i){
-        if(result[i] != 0){
-            matrix[i].is_solved = true;
-            matrix[i].value = result[i];
-        }
-    }
-    
-    check_variants(matrix);
-
-    int count{};
-    for(bool is_going{true}; is_going; ++count){
-        
-        for(int i{}, flag{}; i < 9*9; ++i){
-            if(matrix[i].is_solved) continue;
-            if(matrix[i].number_of_variants() == 1){
-                for(int j{1}; j<10; ++j){
-                    if(matrix[i].character_vector[j] != 0){
-                        matrix[i].value = j;
-                        matrix[i].is_solved = true;
-                        flag = 1;
-                        break;
-                    }                
-                }
-            }
-            if(flag == 1) break;
-        }
-
-        check_variants(matrix);
-
-        switch (is_solved(matrix)) {
-            case NOTSOLVED:{
-                std::cout << count << " There is more than one solution\n";
-                int min_v{10};
-                int index_min{0};
-                int num_vars{0};
-                for(int i{}; i < 9*9; ++i){
-
-                    if(matrix[i].is_solved) continue;
-
-                    num_vars = matrix[i].number_of_variants();
-                    if(min_v > num_vars){
-                        min_v = num_vars;
-                        index_min = i;
-                    }
-                }
-                std::cout <<count << " min index = "<<index_min;
-                for(int i{}; i < 10; ++i){
-                    if(matrix[index_min].character_vector[i] == 1) {
-                        matrix[index_min].value = i;
-                        matrix[index_min].is_solved = true;
-                        std::cout << " and new value = " << i << '\n';
-                        break;
-                    }
-                }
-                check_variants(matrix);
-                break;
-            }
-            case SOLVED:{
-                std::cout << count << " Sulution is passed!\n";
-                is_going = false;
-                break;
-            }
-            case NOSULUTION:{
-                std::cout << count << "There is not solution\n";
-                is_going = false;
-                break;
-            }
-            case ONESOLUTION:{
-                std::cout << count << " There is one solution\n";
-                break;
-            }
-        }
-
-        // std::cout << count << " Cicle is passed\n";
-
-    }
-
-
-    for(int i{}; i < 9*9; ++i) result[i] = matrix[i].value;
-
-    return result;
-}
-
-void Solver::check_variants(Array2D<Cell> &matrix){
-    for(int i{}; i < 9*9; ++i){
-
-        for(int j{}; j < 9*9; ++j){
-            
-            if(matrix[j].is_solved) continue;
-
-            if((i/9 == j/9 || i%9 == j%9 || (i/9/3==j/9/3 && i%9/3==j%9/3)) && i != j){
-                matrix[j].character_vector[matrix[i].value] = 0;
-            }
-        }
-    }
-
-
-
-}
-
-Status Solver::is_solved(Array2D<Cell> &matrix){
-    bool solved{true};
-    bool onesolution{false};
-    
-    for(int i{}; i < 9*9; ++i){
-        if(matrix[i].number_of_variants() == 0) return NOSULUTION;
-        if(matrix[i].number_of_variants() == 1 && !matrix[i].is_solved) onesolution = true;
-        if(!matrix[i].is_solved) solved = false;
-    }
-
-    if(solved) return SOLVED;
-    if(onesolution) return ONESOLUTION;
-    else return NOTSOLVED;
-}
 
 Cadr Solver::create_cadr(Matrix& matrix){
     Cadr result;
@@ -330,7 +204,9 @@ void Solver::reverse_cadr(Cadr& cadr){
     }
 }
 
-void Solver::X_algorithm(Matrix& matrix, std::vector<AssociadetArray*>& stack){
+std::vector<std::vector<AssociadetArray*>> Solver::X_algorithm(Matrix& matrix, std::vector<AssociadetArray*>& stack){
+    std::vector<std::vector<AssociadetArray*>> ansvers;
+    
     std::vector<Cadr> cadrs;
     int index = 0;
     cadrs.push_back(create_cadr(matrix));
@@ -339,8 +215,12 @@ void Solver::X_algorithm(Matrix& matrix, std::vector<AssociadetArray*>& stack){
         if(index < 0) break;
 
         if(matrix.count_colums() == 0){
-            std::cout << "Найдено решение\n";
-            break;
+            ansvers.push_back(stack);
+            reverse_cadr(cadrs.at(index));
+            cadrs.pop_back();
+            --index;
+            stack.pop_back();
+            continue;
         }
 
         if(matrix.count_strings() == 0){
@@ -348,15 +228,13 @@ void Solver::X_algorithm(Matrix& matrix, std::vector<AssociadetArray*>& stack){
             cadrs.pop_back();
             --index;
             stack.pop_back();
-            std::cout << "Тупиковая ветвь\n";
             continue;
         }
         if(cadrs.at(index).X.empty()){
             reverse_cadr(cadrs.at(index));
             cadrs.pop_back();
             --index;
-            stack.pop_back();
-            std::cout << "Варианты закончились\n";
+
             continue;
         }
         cadrs.push_back(next_cadr(matrix, cadrs.at(index), stack));
@@ -368,6 +246,8 @@ void Solver::X_algorithm(Matrix& matrix, std::vector<AssociadetArray*>& stack){
         cadrs.pop_back();
         --index;
     }
+
+    return ansvers;
 }
 
 
@@ -380,10 +260,10 @@ void Cadr::print(){
     std::cout << "---------------\n";
 }
 
-Array2D<int> Solver::solve_with_X_alg(Array2D<int> &field){
+std::vector<Array2D<int>> Solver::solve_with_X_alg(Array2D<int> &field){
     Matrix matrix(4*9*9);
     std::vector<AssociadetArray*> stack;
-    Array2D<int> result(9,9);
+    std::vector<Array2D<int>> result;
     
     for(int index{}; index < 81; ++index){
         if(field[index] != 0){
@@ -398,14 +278,19 @@ Array2D<int> Solver::solve_with_X_alg(Array2D<int> &field){
             }
         }
     }
-    X_algorithm(matrix, stack);
-    std::cout << "X algorithm finished!\n";
+    std::vector<std::vector<AssociadetArray*>> ansvers;
 
-    for(auto string:stack){
-        int index = string->first->head_top->index;                   // декодирование индекса
-        int value = (string->first->right->head_top->index - 81) / 9 + 1; // декодирование значения
+    ansvers = X_algorithm(matrix, stack);
 
-        result[index] = value;
+    for(auto ansver: ansvers){
+        Array2D<int> field(9, 9);
+        for(auto string:ansver){
+            int index = string->first->head_top->index;                   // декодирование индекса
+            int value = (string->first->right->head_top->index - 81) / 9 + 1; // декодирование значения
+
+        field[index] = value;
+        }
+        result.push_back(field);
     }
 
     return result;
