@@ -334,7 +334,7 @@ void Solver::X_algorithm(Matrix& matrix, std::vector<AssociadetArray*>& stack){
     std::vector<Cadr> cadrs;
     int index = 0;
     cadrs.push_back(create_cadr(matrix));
-    
+
     while(true){
         if(index < 0) break;
 
@@ -400,7 +400,7 @@ Array2D<int> Solver::solve_with_X_alg(Array2D<int> &field){
     std::cout << "X algorithm finished!\n";
 
     for(auto string:stack){
-        int index = string->first->head_top->index + 1;                   // декодирование индекса
+        int index = string->first->head_top->index;                   // декодирование индекса
         int value = (string->first->right->head_top->index - 81) / 9 + 1; // декодирование значения
 
         result[index] = value;
@@ -424,9 +424,9 @@ void Solver::create_character_vector(int index, int value, int* character_vector
     k квадрант = i / 3 * 3 + j / 3
 
     character_vector[x] = 1 <81: число в клетке>
-    character_vector[81+9*(n-1)+(j-1)] = 1 <9*<9:число в строке>
-    character_vector[162+9*(n-1)+(i-1)] = 1 <9*<9: число в столбце>>
-    character_vector[243+9*(n-1)+(k-1)] = 1 <9*<9: число в квадранте>>
+    character_vector[81+9*(n-1)+j] = 1 <9*<9:число в строке>
+    character_vector[162+9*(n-1)+i] = 1 <9*<9: число в столбце>>
+    character_vector[243+9*(n-1)+k)] = 1 <9*<9: число в квадранте>>
     */
 
     int i = index/9;          // строка
@@ -434,7 +434,7 @@ void Solver::create_character_vector(int index, int value, int* character_vector
     int k = i/3*3 + j/3;      // квадрант
 
     character_vector[index] = 1;                 // <81: число в клетке>
-    character_vector[81+9*(value-1)+(i-1)] = 1;  // <9*<9:число в строке>
-    character_vector[162+9*(value-1)+(j-1)] = 1; // <9*<9:число в столбце>
-    character_vector[243+9*(value-1)+(k-1)] = 1; // <9*<9:число в квадранте>
+    character_vector[81+9*(value-1)+i] = 1;  // <9*<9:число в строке>
+    character_vector[162+9*(value-1)+j] = 1; // <9*<9:число в столбце>
+    character_vector[243+9*(value-1)+k] = 1; // <9*<9:число в квадранте>
 }

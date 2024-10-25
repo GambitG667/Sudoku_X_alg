@@ -82,7 +82,6 @@ int Colum::lenth_chain(){
 }
 
 Colum::~Colum(){
-    std::cout << index << " colum deleting\n";
     Node* ptr = last;
     while(ptr->top != nullptr){
         ptr = ptr->top;
